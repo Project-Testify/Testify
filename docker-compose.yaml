@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  db:
+    extends:
+      file: ./Server/docker-compose.all.yml
+      service: db
+    networks:
+      - testify-network
+  
+  testify-api:
+    extends:
+      file: ./Server/docker-compose.all.yml
+      service: testify-api
+    environment:
+      - SERVER_PORT
+      - SPRING_APPLICATION_NAME
+
+
+
+      - SPRING_APPLICATION_SECURITY_JWT_SECRET_KEY
+      - SPRING_APPLICATION_SECURITY_JWT_EXPIRATION
+      - SPRING_APPLICATION_SECURITY_JWT_REFRESH_TOKEN_EXPIRATION
+
+      - SPRING_MAIL_HOST
+      - SPRING_MAIL_PORT
+      - SPRING_MAIL_USERNAME
+      - SPRING_MAIL_PASSWORD
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRED
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_CONNECTIONTIMEOUT
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_TIMEOUT
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_WRITETIMEOUT
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://testify-postgres:5432/testify
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME
+        # Hibernate and JPA setting
+      - SPRING_JPA_HIBERNATE_DDL_AUTO
+      - SPRING_JPA_SHOW_SQL
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+      
+    depends_on:
+      - db
+    networks:
+      - testify-network
+
+  testify-AI:
+    extends:
+      file: ./AI-Assistant/docker-compose.yaml
+      service: fastapi-app
+    networks:
+      - testify-network
+    environment:
+      - PINECONE_API_KEY
+      - PINECONE_INDEX_NAME
+      - OPENAI_API_KEY
+      - LOG_MODE=console
+
+  client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"   # Map port 80 of the container to port 80 on the host
+    depends_on:
+      - backend   # Optional: if you have a backend service, this ensures it starts first
+    environment:
+      - VITE_BASEURL
+      - VITE_ASSISTANTURL
+
+
+networks:
+  testify-network:
+    driver: bridge
+    
+  
