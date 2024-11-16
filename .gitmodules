@@ -1,9 +1,9 @@
 [submodule "Client"]
 	path = Client
-	url = git@github.com:Project-Testify/Testify-Frontend.git
+	url = https://github.com/Project-Testify/Testify-Frontend.git
 [submodule "Server"]
 	path = Server
-	url = git@github.com:Project-Testify/Testify-Backend.git
+	url = https://github.com/Project-Testify/Testify-Backend.git
 [submodule "AI-Assistant"]
 	path = AI-Assistant
-	url = git@github.com:Project-Testify/AI-Assistant.git
+	url = https://github.com/Project-Testify/AI-Assistant.git
