@@ -1,17 +1,20 @@
-version: '3.8'
-
 services:
   db:
     extends:
-      file: ./Server/docker-compose.all.yml
+      file: ./Server/docker-compose-all.yml
       service: db
+    ports:
+      - "4585:5432"
     networks:
       - testify-network
+    
   
   testify-api:
     extends:
-      file: ./Server/docker-compose.all.yml
+      file: ./Server/docker-compose-all.yml
       service: testify-api
+    ports:
+      - "4581:4501"
     environment:
       - SERVER_PORT
       - SPRING_APPLICATION_NAME
@@ -41,16 +44,18 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO
       - SPRING_JPA_SHOW_SQL
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-      
+
     depends_on:
       - db
     networks:
       - testify-network
 
-  testify-AI:
+  testify-ai:
     extends:
       file: ./AI-Assistant/docker-compose.yaml
       service: fastapi-app
+    ports:
+      - "4582:7401"
     networks:
       - testify-network
     environment:
@@ -64,9 +69,7 @@ services:
       context: ./Client
       dockerfile: Dockerfile
     ports:
-      - "80:80"   # Map port 80 of the container to port 80 on the host
-    depends_on:
-      - backend   # Optional: if you have a backend service, this ensures it starts first
+      - "4580:80"   # Map port 80 of the container to port 80 on the host
     environment:
       - VITE_BASEURL
       - VITE_ASSISTANTURL
@@ -77,3 +80,5 @@ networks:
     driver: bridge
     
   
+volumes:
+  postgres_data:
